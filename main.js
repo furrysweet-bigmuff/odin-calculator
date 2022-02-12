@@ -1,7 +1,9 @@
-let prevNumber = 0, 
-    operator;
+let firstValue = null,
+    secondValue = null,
+    operator = null,
+    clearFlag = true;
 const display = document.getElementById('display'),
-      upperDisplay = document.getElementById('upperDisplay'),
+      equalBtn = document.getElementById('equal'),
       numericButtons = Array.from(document.getElementsByClassName('numeric')),
       actionButtons = Array.from(document.getElementsByClassName('action'));
 
@@ -21,38 +23,56 @@ function divide(a, b) {
     return a / b
 }
 
-function operate(a, b, currentOperator) {
-    if (currentOperator == '+') {
-        add(a,b)
-    } else if (opcurrentOperatorerator == '-') {
-        subtract(a,b)
-    } else if (currentOperator == '*') {
-        multiply(a,b)
-    } else if (opecurrentOperatorrator == '/') {
-        divide(a,b)
+function operate() {
+    let a = parseInt(firstValue);
+    let b = null;
+    if (!secondValue) {
+        b = parseInt(display.textContent);
+    } else {
+        b = parseInt(secondValue);
+    }
+
+    if (operator == '+') {
+        display.textContent = add(a,b)
+    } else if (operator == '-') {
+        display.textContent = subtract(a,b)
+    } else if (operator == '*') {
+        display.textContent = multiply(a,b)
+    } else if (operator == '/') {
+        display.textContent = divide(a,b)
+    }
+    
+    firstValue = display.textContent;
+    secondValue = null;
+    operator = null; 
+    clearFlag = true;
+}
+
+function numberAction() {
+    if (clearFlag) {
+        display.textContent = this.dataset.value;
+        clearFlag = false;
+    } else {
+        display.textContent += this.dataset.value;
     }
 }
 
-// add chosen value to display section of calculator
-function numberDisplay() {
-    if (display.textContent == 0) {
-        display.textContent = this.dataset.value
-        prevNumber = this.dataset.value
+function operatorAction() {
+    if (!firstValue) {
+        firstValue = display.textContent;
+        clearFlag = true;
+        display.textContent = this.dataset.value;
+        operator = this.dataset.value;
     } else {
-        display.textContent += this.dataset.value
-        prevNumber += this.dataset.value
+        secondValue = display.textContent;
+        clearFlag = true;
+        operate();
+        operator = this.dataset.value; 
     }
-}
 
-function actionDisplay() {
-    if (upperDisplay.textContent == '') {
-        upperDisplay.textContent = prevNumber + ' ' + this.dataset.value + ' ';
-    } else {
-        upperDisplay.textContent += this.dataset.value
-    }
 }
 
 // when user clicks numeric button activate function
-numericButtons.forEach(button => button.addEventListener('click', numberDisplay));
-actionButtons.forEach(button => button.addEventListener('click', actionDisplay));
-
+numericButtons.forEach(button => button.addEventListener('click', numberAction));
+actionButtons.forEach(button => button.addEventListener('click', operatorAction));
+equalBtn.addEventListener('click', operate);
