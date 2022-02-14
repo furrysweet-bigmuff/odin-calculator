@@ -138,7 +138,7 @@ function undo() {
         prevVal = 0;
         clearFlag = true;
     // если число многоразрядное - удаляем разряд
-    } else if (val.toString().length > 1) {
+    } else if (val.toString().length > 1 && val !== 'Error') {
         display.textContent = val.toString().substring(0, val.length - 1);
     } else {
         // если оператор не был задан - значит откатываемся к нулю
