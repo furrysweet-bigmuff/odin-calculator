@@ -43,8 +43,6 @@ function operate() {
     } else {
         b = parseFloat(curVal);
     }
-    console.log(a)
-    console.log(b)
 
     if (operator == '+') {
         resultVal = add(a,b)
@@ -100,6 +98,12 @@ function numberAction() {
 }
 
 function operatorAction() {
+    if (isNum(display.textContent)) {
+        display.textContent = this.dataset.value;
+        operator = this.dataset.value;
+        clearFlag = true;
+        return
+    }
     if (!prevVal) {
         prevVal = display.textContent;
         clearFlag = true;
@@ -118,6 +122,37 @@ function operatorAction() {
             prevVal = display.textContent;
         }
 
+    }
+}
+
+function undo() {
+    let val = display.textContent;
+    // если оператор - то верни предыдущее числовое значение
+    if (isNum(val)) {
+        display.textContent = prevVal;
+        prevVal = null;
+        clearFlag = false;
+    // если выполнили operate нажатием на знак равенства - не откатываем, а сбрасываем к нулю
+    } else if (!prevVal && !curVal) {
+        display.textContent = 0;
+        prevVal = 0;
+        clearFlag = true;
+    // если число многоразрядное - удаляем разряд
+    } else if (val.toString().length > 1) {
+        display.textContent = val.toString().substring(0, val.length - 1);
+    } else {
+        // если оператор не был задан - значит откатываемся к нулю
+        if (!operator) {
+            display.textContent = 0;
+            prevVal = 0;
+            clearFlag = true;
+        } else {
+            // если оператор задан - откатываемся к нему
+            display.textContent = operator;
+            clearFlag = true;
+            clearFlag = true;
+        }
+        
     }
 }
 
@@ -151,7 +186,7 @@ function divideByZeroError() {
 }
 
 function decimal() {
-    if (isNum(display.textContent)) {
+    if (isNum(display.textContent) || display.textContent == 'Error') {
         return
     }
     let arr = display.textContent.toString().split('');
@@ -164,10 +199,6 @@ function decimal() {
     clearFlag = false;
 }
 
-function undo() {
-    
-}
-
 // when user clicks numeric button activate function
 numericButtons.forEach(button => button.addEventListener('click', numberAction));
 actionButtons.forEach(button => button.addEventListener('click', operatorAction));
@@ -175,3 +206,15 @@ equalBtn.addEventListener('click', operate);
 clearBtn.addEventListener('click', clear);
 decimalBtn.addEventListener('click', decimal);
 undoBtn.addEventListener('click', undo);
+
+document.addEventListener('keydown', (event) => {
+    let keyDown = document.querySelector("[data-value=\""+event.key+"\"]")
+    if (event.key === 'Backspace' || event.key ==='c' || event.key === 'C') {
+        clear()
+    } else if (event.key === 'Enter') {
+        operate()
+    }
+    if (keyDown) {
+        keyDown.click()
+    }
+});
